@@ -1,0 +1,16 @@
+{
+    "name": "verifymycontent/identity-check",
+    "version": "1.0.0",
+    "description": "VerifyMyContent Identity Check API SDK",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "VerifyMyContent\\IdentityCheck\\": "src/"
+        }
+    },
+    "minimum-stability": "stable",
+    "require": {
+        "league/oauth2-client": "^2.6"
+    }
+}
