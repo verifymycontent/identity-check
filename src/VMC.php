@@ -32,12 +32,12 @@ class VMC {
     /**
      * URL to be redirect your user after the age-gate
      */
-    public function redirectURL()
+    public function redirectURL($parameters = [])
     {
-        return $this->provider()->getAuthorizationUrl([
+        return $this->provider()->getAuthorizationUrl(array_merge([
             "scope" => Providers\VerifyMyContentProvider::DEFAULT_SCOPE, 
             "state" => $this->state(),
-        ]);
+        ], $parameters));
     }
 
     /**

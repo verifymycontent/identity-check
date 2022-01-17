@@ -21,6 +21,7 @@ $vmc = new VerifyMyContent\IdentityCheck\VMC(getenv('VMC_API_KEY'), getenv('VMC_
 // Redirect or show age-gate if we don't have a code yet
 if (!isset($_GET['code'])) {
     $redirectURL = $vmc->redirectURL();
+    // $redirectURL = $vmc->redirectURL(['user_id' => $your_user_id]);
     $_SESSION['oauth2state'] = $vmc->state();
     header('Location: ' . $redirectURL);
     exit;
