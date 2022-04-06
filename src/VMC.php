@@ -29,6 +29,11 @@ class VMC {
         $this->provider()->useSandbox();
     }
 
+    public function setBaseURL($url)
+    {
+        $this->provider()->setBaseURL($url);
+    }
+
     /**
      * URL to be redirect your user after the age-gate
      */
