@@ -21,6 +21,10 @@ class VerifyMyContentProvider extends \League\OAuth2\Client\Provider\AbstractPro
         $this->baseURL = "https://oauth.sandbox.verifymycontent.com";
     }
 
+    public function setBaseURL($url){
+        $this->baseURL = $url;
+    }
+
     public function getBaseAuthorizationUrl(){
         return "{$this->baseURL}/authorize";
     }
