@@ -11,6 +11,6 @@
     },
     "minimum-stability": "stable",
     "require": {
-        "league/oauth2-client": "^2.6"
+        "verifymycontent/sdk": "^1.0"
     }
 }

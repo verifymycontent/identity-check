@@ -1,91 +1,60 @@
 <?php namespace VerifyMyContent\IdentityCheck;
 
-class VMC {
+use VerifyMyContent\SDK\Core\Validator\ValidationException;
+use VerifyMyContent\SDK\IdentityVerification\Entity\Requests\CreateIdentityVerificationRequest;
+use VerifyMyContent\SDK\IdentityVerification\Entity\Requests\WebhookIdentityVerificationRequest;
+use VerifyMyContent\SDK\VerifyMyContent;
 
-    private $clientID;
+interface IdentityVerificationStatus
+{
+  const PENDING = 'pending';
+  const STARTED = 'started';
+  const EXPIRED = 'expired';
+  const FAILED = 'failed';
+  const APPROVED = 'approved';
+}
 
-    private $clientSecret;
+class VMC
+{
 
-    private $redirectURL;
+  private $client;
 
-    private $currentState;
+  public function __construct($clientID, $clientSecret)
+  {
+    $this->client = (new VerifyMyContent($clientID, $clientSecret))->identityVerification();
+  }
 
-    private $currentProvider;
+  /**
+   * If you're still in development stages, you can use our sandbox environment
+   */
+  public function useSandbox()
+  {
+    $this->client->useSandbox();
+  }
 
-    public function __construct($clientID, $clientSecret, $redirectURL)
-    {
-        $this->clientID = $clientID;
-        $this->clientSecret = $clientSecret;
-        $this->redirectURL = $redirectURL;
-        $this->currentState = null;
-        $this->currentProvider = null;
-    }
+  public function setBaseURL($url)
+  {
+    $this->client->setBaseURL($url);
+  }
 
-    /**
-     * If you're still in development stages, you can use our sandbox environment
-     */
-    public function useSandbox()
-    {
-        $this->provider()->useSandbox();
-    }
+  /**
+   * @throws ValidationException
+   */
+  public function createIdentityVerification($data)
+  {
+    return $this->client->createIdentityVerification(new CreateIdentityVerificationRequest($data));
+  }
 
-    public function setBaseURL($url)
-    {
-        $this->provider()->setBaseURL($url);
-    }
+  public function getIdentityVerification($id)
+  {
+    return $this->client->getIdentityVerification($id);
+  }
 
-    /**
-     * URL to be redirect your user after the age-gate
-     */
-    public function redirectURL($parameters = [])
-    {
-        return $this->provider()->getAuthorizationUrl(array_merge([
-            "scope" => Providers\VerifyMyContentProvider::DEFAULT_SCOPE, 
-            "state" => $this->state(),
-        ], $parameters));
-    }
-
-    /**
-     * OAuth state parameter used to avoid CSRF attacks
-     */
-    public function state()
-    {
-        if (null === $this->currentState) {
-            $this->currentState = uniqid();
-        }
-        return $this->currentState;
-    }
-
-    /**
-     * Exchange code by an access token
-     */
-    public function exchangeCodeByToken($code)
-    {
-        return $this->provider()->getAccessToken('authorization_code', [
-            'code' => $code,
-        ]);
-    }
-
-    /**
-     * Return user data
-     */
-    public function user($accessToken)
-    {
-        return $this->provider()->getResourceOwner($accessToken)->toArray();
-    }
-
-    /**
-     * VMA Provider
-     */
-    private function provider()
-    {
-        if ($this->currentProvider === null) {
-            $this->currentProvider = new Providers\VerifyMyContentProvider([
-                'clientId'                 => $this->clientID,
-                'clientSecret'             => $this->clientSecret,
-                'redirectUri'              => $this->redirectURL,
-            ]);
-        }
-        return $this->currentProvider;
-    }
+  /**
+   * @throws ValidationException
+   */
+  public function parseIdentityVerificationWebhookPayload($data)
+  {
+    return new WebhookIdentityVerificationRequest($data);
+  }
 }
