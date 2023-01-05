@@ -10,37 +10,83 @@ composer require verifymycontent/identity-check
 
 ## Get Started
 
+The main class to handle the moderation integration process is the \VerifyMyContent\IdentityCheck\VMC. It will abstract the HMAC generation for the API calls.
+
+## Start an Identity Verification
 ```php
 <?php
-
 require(__DIR__ . "/vendor/autoload.php");
 
-$vmc = new VerifyMyContent\IdentityCheck\VMC(getenv('VMC_API_KEY'), getenv('VMC_API_SECRET'), getenv('VMC_REDIRECT_URL'));
+$vmc = new \VerifyMyContent\IdentityCheck\VMC(getenv('VMC_API_KEY'), getenv('VMC_API_SECRET'));
 //$vmc->useSandbox();
 
-// Redirect or show age-gate if we don't have a code yet
-if (!isset($_GET['code'])) {
-    $redirectURL = $vmc->redirectURL();
-    // $redirectURL = $vmc->redirectURL(['user_id' => $your_user_id]);
-    $_SESSION['oauth2state'] = $vmc->state();
-    header('Location: ' . $redirectURL);
-    exit;
+try {
+    $response = $vmc->createIdentityVerification([
+            "customer" => [
+                "id" => "YOUR-CUSTOMER-UNIQUE-ID",
+                "email" => "person@example.com",
+                "phone" => "+4412345678"
+            ],
+            "redirect_uri" => "https://example.com/callback",
+            "webhook" => "https://example.com/webhook",
+        ]
+    );
+    
+    // save $response->id if you want to save the verification of your customer
 
-// Avoid CSRF attack
-} elseif (empty($_GET['state']) || (isset($_SESSION['oauth2state']) && $_GET['state'] !== $_SESSION['oauth2state'])) {
-    if (isset($_SESSION['oauth2state'])) {
-        unset($_SESSION['oauth2state']);
-    }
-    exit('Invalid state');
-} else {
-    try {
-        // Try to get an access token using the authorization code grant.
-        $accessToken = $vmc->exchangeCodeByToken($_GET['code']);
-        $user = $vmc->user($accessToken);
-        var_export($user);
-    } catch (\Exception $e) {
-        // Failed to get the access token or user details.
-        exit($e->getMessage());
-    }
+    // redirect user to check identity
+    header("Location: {$response->redirect_uri}");
+} catch (Exception $e) {
+  echo $e;
+}
+```
+
+### Retrieve Identity Verification by ID
+
+Retrieves a specific identity verification to get current status.
+
+- Pass the `id` of the identity verification to the `getIdentityVerification` method.
+- Receive an `\VerifyMyContent\SDK\IdentityVerification\Entity\Responses\GetIdentityVerificationResponse` (library used internally by this sdk).
+
+
+```php
+<?php
+require(__DIR__ . "/vendor/autoload.php");
+
+$vmc = new \VerifyMyContent\IdentityCheck\VMC(getenv('VMC_API_KEY'), getenv('VMC_API_SECRET'));
+//$vmc->useSandbox();
+
+$response = $vmc->getIdentityVerification("YOUR-IDENTITY-VERIFICATION-ID");
+
+// Printing current status
+echo "Status: {$response->status}";
+```
+
+### Receive an Identity Verification Webhook
+
+Receive a webhook from VerifyMyContent when the identity verification status changes.
+
+- Receive a webhook from VerifyMyContent with the `$_POST` data that can be parsed using method `parseIdentityVerificationWebhookPayload`.
+
+```php
+<?php
+require(__DIR__ . "/vendor/autoload.php");
+
+$vmc = new \VerifyMyContent\IdentityCheck\VMC(getenv('VMC_API_KEY'), getenv('VMC_API_SECRET'));
+
+$jsonPayload = '{
+  "id": "ABC-123-5678-ABC",
+  "customer_id": "customer_id",
+  "status": "pending"
+}';
+$data = json_decode($jsonPayload, true);
+$webhook = $vmc->parseIdentityVerificationWebhookPayload($data);
+
+// Printing current status
+echo "Status: {$webhook->status} received from verification {$webhook->id}";
+
+// This is how you can check if the identity verification is approved.
+if ($webhook->status === \VerifyMyContent\IdentityCheck\IdentityVerificationStatus::APPROVED) {
+    // do your thing
 }
 ```
