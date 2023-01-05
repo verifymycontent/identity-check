@@ -86,7 +86,7 @@ $webhook = $vmc->parseIdentityVerificationWebhookPayload($data);
 echo "Status: {$webhook->status} received from verification {$webhook->id}";
 
 // This is how you can check if the identity verification is approved.
-if ($webhook->status === \VerifyMyContent\IdentityCheck\IdentityVerificationStatus::APPROVED) {
+if ($webhook->status === \VerifyMyContent\SDK\IdentityVerification\IdentityVerificationStatus::APPROVED) {
     // do your thing
 }
 ```
