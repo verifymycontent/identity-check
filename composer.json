@@ -1,6 +1,6 @@
 {
     "name": "verifymycontent/identity-check",
-    "version": "1.0.2",
+    "version": "2.0.1",
     "description": "VerifyMyContent Identity Check API SDK",
     "type": "library",
     "license": "MIT",
