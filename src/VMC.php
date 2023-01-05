@@ -5,15 +5,6 @@ use VerifyMyContent\SDK\IdentityVerification\Entity\Requests\CreateIdentityVerif
 use VerifyMyContent\SDK\IdentityVerification\Entity\Requests\WebhookIdentityVerificationRequest;
 use VerifyMyContent\SDK\VerifyMyContent;
 
-interface IdentityVerificationStatus
-{
-  const PENDING = 'pending';
-  const STARTED = 'started';
-  const EXPIRED = 'expired';
-  const FAILED = 'failed';
-  const APPROVED = 'approved';
-}
-
 class VMC
 {
 
