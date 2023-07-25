@@ -90,3 +90,43 @@ if ($webhook->status === \VerifyMyContent\SDK\IdentityVerification\IdentityVerif
     // do your thing
 }
 ```
+
+### Add allowed redirect urls
+
+Update the list of allowed redirect urls
+
+```php
+<?php
+require(__DIR__ . "/vendor/autoload.php");
+
+$vmc = new \VerifyMyContent\IdentityCheck\VMC(getenv('VMC_API_KEY'), getenv('VMC_API_SECRET'));
+$vmc->useSandbox();
+
+try{
+  $vmc->addAllowedRedirectUrls(["https://teste1.com", "https://teste2.com"]);
+  echo "Urls replaced with success";
+}catch(Exception $e){
+  echo "Error";
+  var_export($e);
+}
+```
+
+### Remove allowed redirect urls
+
+Remove allowed redirect urls from the list
+
+```php
+<?php
+require(__DIR__ . "/vendor/autoload.php");
+
+$vmc = new \VerifyMyContent\IdentityCheck\VMC(getenv('VMC_API_KEY'), getenv('VMC_API_SECRET'));
+$vmc->useSandbox();
+
+try{
+  $vmc->removeAllowedRedirectUrls(["https://teste1.com"]);
+  echo "Urls removed with success";
+}catch(Exception $e){
+  echo "Error";
+  var_export($e);
+}
+```
