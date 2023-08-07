@@ -11,6 +11,6 @@
     },
     "minimum-stability": "stable",
     "require": {
-        "verifymycontent/sdk": "^2.0"
+        "verifymycontent/sdk": "^2.1.1"
     }
 }
