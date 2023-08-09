@@ -10,12 +10,9 @@ class VMC
 
   private $client;
 
-  private $verifyMyContent;
-
   public function __construct($clientID, $clientSecret)
   {
-    $this->verifyMyContent = new VerifyMyContent($clientID, $clientSecret);
-    $this->client = $this->verifyMyContent->identityVerification();
+    $this->client = (new VerifyMyContent($clientID, $clientSecret))->identityVerification();
   }
 
   /**
@@ -24,7 +21,6 @@ class VMC
   public function useSandbox()
   {
     $this->client->useSandbox();
-    $this->verifyMyContent->useSandbox();
   }
 
   public function setBaseURL($url)
@@ -43,14 +39,6 @@ class VMC
   public function getIdentityVerification($id)
   {
     return $this->client->getIdentityVerification($id);
-  }
-
-  public function addAllowedRedirectUrls($urls){
-    $this->verifyMyContent->addRedirectUrls($urls);
-  }
-
-  public function removeAllowedRedirectUrls($urls){
-    $this->verifyMyContent->removeRedirectUrls($urls);
   }
 
   /**
