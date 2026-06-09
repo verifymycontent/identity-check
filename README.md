@@ -91,6 +91,72 @@ if ($webhook->status === \VerifyMyContent\SDK\IdentityVerification\IdentityVerif
 }
 ```
 
+### Start a Re-Identification
+
+```php
+<?php
+require(__DIR__ . "/vendor/autoload.php");
+
+$vmc = new \VerifyMyContent\IdentityCheck\VMC(getenv('VMC_API_KEY'), getenv('VMC_API_SECRET'));
+//$vmc->useSandbox();
+
+try {
+    $response = $vmc->createReIdentification([
+        "customer" => [
+            "id" => "YOUR-CUSTOMER-UNIQUE-ID",
+            "email" => "person@example.com", // optional
+        ],
+        "redirect_uri" => "https://example.com/callback",
+        "webhook" => "https://example.com/webhook",
+    ]);
+
+    // redirect user to re-identify
+    header("Location: {$response->redirect_uri}");
+} catch (\VerifyMyContent\SDK\ReIdentification\Exception\FeatureNotEnabledException $e) {
+    echo "Re-identification feature not enabled for this account.";
+} catch (\VerifyMyContent\SDK\ReIdentification\Exception\NoApprovedVerificationFoundException $e) {
+    echo "No approved verification found for this customer.";
+} catch (Exception $e) {
+    echo $e;
+}
+```
+
+### Retrieve Re-Identification by ID
+
+Retrieves a specific re-identification to get current status.
+
+- Pass the `id` of the re-identification to the `getReIdentification` method.
+- Receive an `\VerifyMyContent\SDK\ReIdentification\Entity\Responses\GetReIdentificationResponse` (library used internally by this sdk).
+
+
+```php
+<?php
+require(__DIR__ . "/vendor/autoload.php");
+
+$vmc = new \VerifyMyContent\IdentityCheck\VMC(getenv('VMC_API_KEY'), getenv('VMC_API_SECRET'));
+//$vmc->useSandbox();
+
+$response = $vmc->getReIdentification("YOUR-RE-IDENTIFICATION-ID");
+
+// Printing current status
+echo "Status: {$response->status}";
+```
+
+### Receive a Re-Identification Webhook
+
+```php
+<?php
+require(__DIR__ . "/vendor/autoload.php");
+
+$vmc = new \VerifyMyContent\IdentityCheck\VMC(getenv('VMC_API_KEY'), getenv('VMC_API_SECRET'));
+
+$data = json_decode(file_get_contents('php://input'), true);
+$webhook = $vmc->parseReIdentificationWebhookPayload($data);
+
+// Printing current status
+echo "Status: {$webhook->status} received from re-identification {$webhook->id}";
+```
+
 ### Add allowed redirect urls
 
 Update the list of allowed redirect urls
